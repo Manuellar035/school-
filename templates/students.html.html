@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Students · SMS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: #f5f7fb;
+            min-height: 100vh;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h2 {
+            color: #333;
+        }
+
+        .back-link {
+            color: #667eea;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .stats-bar {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+        }
+
+        .form-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+        }
+
+        .form-title {
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-input {
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102,126,234,0.1);
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102,126,234,0.4);
+        }
+
+        .students-list {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .list-header {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .list-header h3 {
+            color: #333;
+            font-size: 1.2rem;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .student-count {
+            color: #666;
+            background: #e8f0fe;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Improved Search Bar Styles */
+        .search-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            color: #999;
+            font-size: 1rem;
+            pointer-events: none;
+        }
+
+        .search-input {
+            padding: 10px 16px 10px 40px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 14px;
+            width: 250px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102,126,234,0.1);
+            width: 300px;
+        }
+
+        .search-input::placeholder {
+            color: #999;
+        }
+
+        .clear-search {
+            position: absolute;
+            right: 12px;
+            color: #999;
+            cursor: pointer;
+            font-size: 1rem;
+            display: none;
+        }
+
+        .clear-search:hover {
+            color: #dc3545;
+        }
+
+        .search-input:not(:placeholder-shown) + .clear-search {
+            display: block;
+        }
+
+        /* Search results info */
+        .search-info {
+            padding: 10px 30px;
+            background: #e8f0fe;
+            color: #667eea;
+            font-size: 0.9rem;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #d0e0ff;
+        }
+
+        .search-info.show {
+            display: flex;
+        }
+
+        .clear-all-btn {
+            background: none;
+            border: none;
+            color: #667eea;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .clear-all-btn:hover {
+            background: rgba(102,126,234,0.1);
+        }
+
+        .student-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 100px;
+            padding: 15px 30px;
+            border-bottom: 1px solid #f0f0f0;
+            align-items: center;
+            transition: background 0.3s;
+        }
+
+        .student-row:hover {
+            background: #f8f9fa;
+        }
+
+        .student-row.header {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .student-row.hidden {
+            display: none;
+        }
+
+        /* Highlight matching text */
+        .highlight {
+            background-color: #fff3cd;
+            font-weight: 600;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .student-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .edit-btn, .delete-btn {
+            padding: 5px 10px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 13px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s;
+        }
+
+        .edit-btn {
+            background: #e8f0fe;
+            color: #667eea;
+        }
+
+        .delete-btn {
+            background: #fee;
+            color: #dc3545;
+        }
+
+        .edit-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #dc3545;
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px;
+            color: #999;
+        }
+
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+
+        .flash-message {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .flash-message.success {
+            background: #e8f5e9;
+            color: #28a745;
+            border-left: 4px solid #28a745;
+        }
+
+        .flash-message.error {
+            background: #fee;
+            color: #dc3545;
+            border-left: 4px solid #dc3545;
+        }
+
+        /* No results message */
+        .no-results {
+            padding: 40px;
+            text-align: center;
+            color: #999;
+            display: none;
+        }
+
+        .no-results.show {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 15px; }
+            
+            .list-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .header-right {
+                width: 100%;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .search-wrapper {
+                width: 100%;
+            }
+            
+            .search-input {
+                width: 100%;
+            }
+            
+            .search-input:focus {
+                width: 100%;
+            }
+            
+            .student-row { 
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .student-row.header { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>📚 Student Management</h2>
+            <a href="/dashboard" class="back-link">← Back to Dashboard</a>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash-message {{ category }}">
+                            <span>{% if category == 'error' %}⚠️{% else %}✓{% endif %}</span>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-value">{{ total_count }}</span>
+                <span class="stat-label">Total Students</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">{{ students|map(attribute='student_class')|unique|list|length }}</span>
+                <span class="stat-label">Classes</span>
+            </div>
+        </div>
+
+        <div class="form-card">
+            <h3 class="form-title">
+                <span>➕</span> Add New Student
+            </h3>
+            <form method="POST">
+                <div class="form-grid">
+                    <input type="text" name="name" class="form-input" placeholder="Full Name" required>
+                    <input type="text" name="admission" class="form-input" placeholder="Admission Number" required>
+                    <input type="text" name="class" class="form-input" placeholder="Class" required>
+                    <input type="number" name="age" class="form-input" placeholder="Age" required>
+                </div>
+                <button type="submit" class="submit-btn">Add Student to Database</button>
+            </form>
+        </div>
+
+        <div class="students-list">
+            <div class="list-header">
+                <h3>📋 Student Records</h3>
+                <div class="header-right">
+                    <span class="student-count">{{ total_count }} student{{ 's' if total_count != 1 else '' }}</span>
+                    
+                    <!-- Search Bar - Perfectly Positioned -->
+                    <div class="search-wrapper">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" 
+                               id="searchInput" 
+                               class="search-input" 
+                               placeholder="Search by name, class, admission..." 
+                               onkeyup="searchStudents()"
+                               autocomplete="off">
+                        <span class="clear-search" onclick="clearSearch()" title="Clear search">✕</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Info Bar -->
+            <div id="searchInfo" class="search-info">
+                <span id="searchResultsCount"></span>
+                <button class="clear-all-btn" onclick="clearSearch()">Clear Search</button>
+            </div>
+
+            {% if students %}
+            <div class="student-row header">
+                <div>Name</div>
+                <div>Admission No.</div>
+                <div>Class</div>
+                <div>Age</div>
+                <div>Actions</div>
+            </div>
+
+            <div id="studentsContainer">
+                {% for student in students %}
+                <div class="student-row" data-name="{{ student.name|lower }}" 
+                                           data-admission="{{ student.admission_number|lower }}"
+                                           data-class="{{ student.student_class|lower }}"
+                                           data-age="{{ student.age }}">
+                    <div><strong>{{ student.name }}</strong></div>
+                    <div>#{{ student.admission_number }}</div>
+                    <div>{{ student.student_class }}</div>
+                    <div>{{ student.age }} years</div>
+                    <div class="student-actions">
+                        <a href="/student/{{ student.id }}/edit" class="edit-btn">✏️ Edit</a>
+                        <form action="/student/{{ student.id }}/delete" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete {{ student.name }}?');">
+                            <button type="submit" class="delete-btn">🗑️ Delete</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- No Results Message -->
+            <div id="noResults" class="no-results">
+                <p>🔍 No students match your search</p>
+                <p style="font-size: 14px; margin-top: 10px;">Try different keywords or <a href="#" onclick="clearSearch()" style="color: #667eea;">clear search</a></p>
+            </div>
+
+            {% else %}
+            <div class="empty-state">
+                <p>📭 No students in database yet</p>
+                <p style="font-size: 14px; margin-top: 10px;">Add your first student using the form above</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+    function searchStudents() {
+        let input = document.getElementById('searchInput').value.toLowerCase().trim();
+        let rows = document.querySelectorAll('.student-row:not(.header)');
+        let searchInfo = document.getElementById('searchInfo');
+        let noResults = document.getElementById('noResults');
+        let visibleCount = 0;
+        
+        // If search is empty, show all and hide search info
+        if (input === '') {
+            rows.forEach(row => {
+                row.classList.remove('hidden');
+            });
+            searchInfo.classList.remove('show');
+            if (noResults) noResults.classList.remove('show');
+            
+            // Clear any highlights
+            removeHighlights();
+            return;
+        }
+        
+        // Search through each row
+        rows.forEach(row => {
+            // Get all searchable text
+            let name = row.querySelector('div:first-child').textContent.toLowerCase();
+            let admission = row.querySelector('div:nth-child(2)').textContent.toLowerCase();
+            let studentClass = row.querySelector('div:nth-child(3)').textContent.toLowerCase();
+            let age = row.querySelector('div:nth-child(4)').textContent.toLowerCase();
+            
+            // Check if input matches any field
+            let matches = name.includes(input) || 
+                         admission.includes(input) || 
+                         studentClass.includes(input) || 
+                         age.includes(input);
+            
+            if (matches) {
+                row.classList.remove('hidden');
+                visibleCount++;
+                
+                // Highlight matching text (optional)
+                highlightText(row, input);
+            } else {
+                row.classList.add('hidden');
+            }
+        });
+        
+        // Update search info
+        let totalRows = rows.length;
+        document.getElementById('searchResultsCount').textContent = 
+            `Found ${visibleCount} student${visibleCount !== 1 ? 's' : ''} matching "${document.getElementById('searchInput').value}"`;
+        searchInfo.classList.add('show');
+        
+        // Show/hide no results message
+        if (visibleCount === 0) {
+            if (noResults) noResults.classList.add('show');
+        } else {
+            if (noResults) noResults.classList.remove('show');
+        }
+    }
+
+    function clearSearch() {
+        let input = document.getElementById('searchInput');
+        input.value = '';
+        searchStudents();
+        
+        // Remove all highlights
+        removeHighlights();
+    }
+
+    function removeHighlights() {
+        // This removes any highlight spans if you implement highlighting
+        let rows = document.querySelectorAll('.student-row:not(.header)');
+        rows.forEach(row => {
+            // Restore original text if you implement highlighting
+            // This is optional and depends on how you implement highlighting
+        });
+    }
+
+    function highlightText(row, searchTerm) {
+        // Optional: Implement text highlighting
+        // This is more complex and would require manipulating the HTML
+        // For now, we'll just rely on the filtering
+    }
+
+    // Add keyboard shortcut to focus search (Ctrl + /)
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey && e.key === '/') {
+            e.preventDefault();
+            document.getElementById('searchInput').focus();
+        }
+    });
+    </script>
+</body>
+</html>
